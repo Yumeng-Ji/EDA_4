@@ -192,18 +192,21 @@ public class Graph {
 
                 if (r.nextDouble() > d) {
                     fin = true;
+                    continue;
                 }
                 // obtener la lista de vecinos del nodo actual
                 ArrayList<Integer> vecinos = adjList[actual];
 
                 if (vecinos.isEmpty()) {
                     fin = true;
+                    continue;
                 }
                 // seleccionar un vecino aleatorio
                 int siguiente = vecinos.get(r.nextInt(vecinos.size()));
 
                 if (examinados.contains(siguiente)) {
                     fin = true;
+                    continue;
                 }
 
                 actual = siguiente;
@@ -282,9 +285,8 @@ public class Graph {
                 double dif = prActual[i] - prAnterior[i];
                 if (dif < 0) {
                     dif = -dif; // Valor absoluto
-                } else {
-                    diferencia = diferencia + dif;
                 }
+                diferencia = diferencia + dif;
             }
             iteraciones++;
 
