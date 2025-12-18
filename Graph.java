@@ -172,11 +172,17 @@ public class Graph {
         double d = 0.85; // damping factor
         Random r = new Random();
         HashMap<String, Double> result = new HashMap<String, Double>();
-        int[] contador = new int[keys.length];
+
+        if (keys == null || keys.length == 0) {
+            System.out.println("El grafo está vacío, no se puede ejecutar Random Walk");
+            return result; // HashMap vacío
+        }
+
+        int[] contador = new int[keys.length]; // array para contar cuántas veces se visita cada nodo
 
         for (int test = 0; test < nTests; test++) {
-            int actual = r.nextInt(keys.length);
-            ArrayList<Integer> examinados = new ArrayList<Integer>();
+            int actual = r.nextInt(keys.length); // seleccionar un nodo inicial aleatorio
+            ArrayList<Integer> examinados = new ArrayList<Integer>(); // lista para nodos visitados en este recorrido
 
             boolean fin = false;
 
@@ -187,13 +193,13 @@ public class Graph {
                 if (r.nextDouble() > d) {
                     fin = true;
                 }
-
+                // obtener la lista de vecinos del nodo actual
                 ArrayList<Integer> vecinos = adjList[actual];
 
                 if (vecinos.isEmpty()) {
                     fin = true;
                 }
-
+                // seleccionar un vecino aleatorio
                 int siguiente = vecinos.get(r.nextInt(vecinos.size()));
 
                 if (examinados.contains(siguiente)) {
@@ -207,7 +213,7 @@ public class Graph {
         for (int i : contador) {
             totalVisitas = totalVisitas + i;
         }
-
+        // calcular el total de visitas a todos los nodos
         for (int i = 0; i < keys.length; i++) {
             if (totalVisitas > 0) {
                 result.put(keys[i], (double) contador[i] / totalVisitas);
@@ -224,6 +230,12 @@ public class Graph {
         boolean damping = true; // tracing the pagerank algorithm
         double d = 0.85;
         double umbral = 0.0001;
+        HashMap<String, Double> result = new HashMap<>();
+
+        if (keys == null || keys.length == 0) {
+            System.out.println("El grafo está vacío, no se puede ejecutar PageRank");
+            return result;
+        }
 
         int n = keys.length;
         double[] prActual = new double[n];
@@ -285,7 +297,6 @@ public class Graph {
         }
 
         // Convertir a HashMap para retornar
-        HashMap<String, Double> result = new HashMap<>();
         for (int i = 0; i < n; i++) {
             result.put(keys[i], prActual[i]);
         }
