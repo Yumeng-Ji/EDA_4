@@ -69,10 +69,11 @@ public class Graph {
     }
 
     public void print(){
-        for (String web : enlaces.keySet()){
-            System.out.print("Element: " + web + " >>> ");
-            for (String saliente : enlaces.get(web))  System.out.print(saliente + " ### ");
-
+        for (int i = 0; i < keys.length; i++){
+            System.out.print("Autor: " + keys[i] + " -> Conectado con: ");
+            for (int saliente : adjList[i]) {
+                System.out.print(keys[saliente] + ", ");
+            }
             System.out.println();
         }
     }
@@ -170,17 +171,126 @@ public class Graph {
     public HashMap<String, Double> calcularRandomWalkRank(int nTests) {
         double d = 0.85; // damping factor
         Random r = new Random();
+        HashMap<String, Double> result = new HashMap<String, Double>();
+        int[] contador = new int[keys.length];
 
-        // COMPLETAR CÓDIGO
+        for (int test = 0; test < nTests; test++) {
+            int actual = r.nextInt(keys.length);
+            ArrayList<Integer> examinados = new ArrayList<Integer>();
 
+            boolean fin = false;
+
+            while (!fin) {
+                contador[actual]++;
+                examinados.add(actual);
+
+                if (r.nextDouble() > d) {
+                    fin = true;
+                }
+
+                ArrayList<Integer> vecinos = adjList[actual];
+
+                if (vecinos.isEmpty()) {
+                    fin = true;
+                }
+
+                int siguiente = vecinos.get(r.nextInt(vecinos.size()));
+
+                if (examinados.contains(siguiente)) {
+                    fin = true;
+                }
+
+                actual = siguiente;
+            }
+        }
+        int totalVisitas = 0;
+        for (int i : contador) {
+            totalVisitas = totalVisitas + i;
+        }
+
+        for (int i = 0; i < keys.length; i++) {
+            if (totalVisitas > 0) {
+                result.put(keys[i], (double) contador[i] / totalVisitas);
+            } else {
+                result.put(keys[i], 0.0);
+            }
+        }
+        return result;
     }
 
 
     public HashMap<String, Double> calcularPageRank() {
         boolean trace = false; // tracing the pagerank algorithm
         boolean damping = true; // tracing the pagerank algorithm
+        double d = 0.85;
+        double umbral = 0.0001;
 
-        // COMPLETAR CÓDIGO
+        int n = keys.length;
+        double[] prActual = new double[n];
+        double[] prAnterior = new double[n];
+
+        for (int i = 0; i < n; i++) {
+            prActual[i] = 1.0 / n;
+            prAnterior[i] = 1.0 / n;
+        }
+
+        int iteraciones = 0;
+        double diferencia = 1000000.0; // Número grande inicial
+
+        while (diferencia > umbral && iteraciones < 100) {
+            if (trace) {
+                System.out.println("Iteración" + iteraciones);
+            }
+            // Copiar valores actuales a la iteración anterior
+            for (int i = 0; i < n; i++) {
+                prAnterior[i] = prActual[i];
+            }
+            // Calcular PageRank para cada nodo
+            for (int i = 0; i < n; i++) {
+                double suma = 0.0;
+                // Encontrar todos los nodos que apuntan al nodo i
+                for (int j = 0; j < n; j++) {
+                    if (i != j && adjList[j].contains(i)) {
+                        int salientes = adjList[j].size();
+                        if (salientes > 0) {
+                            suma = suma + prAnterior[j] / salientes;
+                        }
+                    }
+                }
+                // Aplicar fórmula de PageRank
+                if (damping) {
+                    prActual[i] = (1 - d) / n + d * suma;
+                } else {
+                    prActual[i] = suma;
+                }
+            }
+            // Calcular diferencia total
+            diferencia = 0.0;
+            for (int i = 0; i < n; i++) {
+                double dif = prActual[i] - prAnterior[i];
+                if (dif < 0) {
+                    dif = -dif; // Valor absoluto
+                } else {
+                    diferencia = diferencia + dif;
+                }
+            }
+            iteraciones++;
+
+            if (trace) {
+                System.out.println("Diferencia: " + diferencia);
+            }
+        }
+        if (trace) {
+            System.out.println("Convergió en " + iteraciones + "iteraciones");
+        }
+
+        // Convertir a HashMap para retornar
+        HashMap<String, Double> result = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            result.put(keys[i], prActual[i]);
+        }
+
+        return result;
 
     }
 
@@ -189,7 +299,7 @@ public class Graph {
         //       Es ineficiente porque calcula los máximos consecutivamente, y borra el máximo anterior, es decir, borra los valores de entrada
         //       Puede ser útil para visualizar los resultados
         for (int x = 1; x <= n; x++) {
-            double max = -1;
+            double max = -1.0;
             int iMax = -1;
             for (int j = 0; j < pr.length; j++)
                 if (pr[j] > max) {
@@ -197,12 +307,8 @@ public class Graph {
                     iMax = j;
                 }
             System.out.println("The " + x + "th best element is "
-                    + id2String[iMax] + " with value " + max);
+                    + keys[iMax] + " with value " + max);
             pr[iMax] = -1; // delete the maximum
         }
     }
-
-}
-
-
 }
