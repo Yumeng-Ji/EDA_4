@@ -117,6 +117,22 @@ public class TestGraph {
         System.out.println("   PageRank: " + tiempoPR + " ms");
         System.out.println("   Diferencia: " + Math.abs(tiempoRW - tiempoPR) + " ms");
 
+
+        System.out.println("\n--- PRUEBA IMPRIMIR LOS DE MEJOR PAGERANK ---");
+
+        // Ejecutar PageRank para obtener resultados
+        System.out.println("Ejecutando PageRank para obtener resultados...");
+        startTime = System.currentTimeMillis();
+        grafo.calcularPageRank();
+        endTime = System.currentTimeMillis();
+        System.out.println("PageRank completado en " + (endTime - startTime) + " ms");
+
+        // Crear array con valores de PageRank para usar imprimirLosDeMejorPageRank
+        // Primero necesitamos obtener los resultados
+        System.out.println("\nProbando imprimirLosDeMejorPageRank con datos reales:");
+        System.out.println("Nota: Para esta prueba necesitaríamos modificar el código para obtener los valores");
+        System.out.println("de PageRank y convertirlos a un array double[]");
+
         // Limpiar para la siguiente prueba
         repo.getListaAutores().clear();
         repo.getListaPublicaciones().clear();
@@ -150,6 +166,17 @@ public class TestGraph {
             } catch (Exception e) {
                 System.out.println("✓ PageRank lanza excepción en grafo vacío");
             }
+
+            // Probando imprimirLosDeMejorPageRank en grafo vacío
+            System.out.println("Probando imprimirLosDeMejorPageRank en grafo vacío...");
+            try {
+                double[] valoresVacios = new double[0];
+                grafoVacio.imprimirLosDeMejorPageRank(valoresVacios, 5);
+                System.out.println("✓ imprimirLosDeMejorPageRank ejecutado en grafo vacío (array vacío)");
+            } catch (Exception e) {
+                System.out.println("✗ imprimirLosDeMejorPageRank lanzó excepción: " + e.getMessage());
+            }
+
         } catch (Exception e) {
             System.out.println("Excepción esperada: " + e.getMessage());
         }
@@ -177,6 +204,12 @@ public class TestGraph {
         System.out.println("Probando PageRank con un solo autor...");
         grafoSolitario.calcularPageRank();
         System.out.println("✓ PageRank ejecutado con un solo autor");
+
+        // Probando imprimirLosDeMejorPageRank con un solo autor
+        System.out.println("Probando imprimirLosDeMejorPageRank con un solo autor...");
+        double[] valoresSolitario = {0.5}; // Valor de ejemplo
+        grafoSolitario.imprimirLosDeMejorPageRank(valoresSolitario, 3);
+        System.out.println("✓ imprimirLosDeMejorPageRank ejecutado con un solo autor");
 
         // Caso 3: Grafo completamente conectado
         System.out.println("\n--- Caso 3: Grafo completamente conectado ---");
@@ -212,6 +245,12 @@ public class TestGraph {
         grafoConectado.calcularPageRank();
         fin = System.currentTimeMillis();
         System.out.println("✓ PageRank ejecutado en " + (fin - inicio) + " ms");
+
+        // Probando imprimirLosDeMejorPageRank con grafo conectado
+        System.out.println("Probando imprimirLosDeMejorPageRank en grafo completamente conectado...");
+        double[] valoresConectados = {0.3, 0.3, 0.3}; // Valores similares para autores conectados
+        grafoConectado.imprimirLosDeMejorPageRank(valoresConectados, 2);
+        System.out.println("✓ imprimirLosDeMejorPageRank ejecutado en grafo completamente conectado");
 
         // Caso 4: Grafo en estrella (un autor central conectado a muchos)
         System.out.println("\n--- CASO 4: Grafo en estrella ---");
@@ -261,6 +300,12 @@ public class TestGraph {
         fin = System.currentTimeMillis();
         System.out.println("✓ PageRank ejecutado en " + (fin - inicio) + " ms");
 
+        // Probando imprimirLosDeMejorPageRank con grafo estrella
+        System.out.println("Probando imprimirLosDeMejorPageRank en grafo estrella...");
+        double[] valoresEstrella = {0.5, 0.125, 0.125, 0.125, 0.125}; // Centro alto, periferias bajas
+        grafoEstrella.imprimirLosDeMejorPageRank(valoresEstrella, 3);
+        System.out.println("✓ imprimirLosDeMejorPageRank ejecutado en grafo estrella");
+
         // Caso 5: Grafo lineal
         System.out.println("\n--- Caso 5: Grafo lineal ---");
         repo.getListaAutores().clear();
@@ -303,6 +348,12 @@ public class TestGraph {
         grafoLineal.calcularPageRank();
         fin = System.currentTimeMillis();
         System.out.println("✓ PageRank ejecutado en " + (fin - inicio) + " ms");
+
+        // Probando imprimirLosDeMejorPageRank con grafo lineal
+        System.out.println("Probando imprimirLosDeMejorPageRank en grafo lineal...");
+        double[] valoresLineal = {0.3, 0.25, 0.25, 0.2}; // Valores decrecientes
+        grafoLineal.imprimirLosDeMejorPageRank(valoresLineal, 2);
+        System.out.println("✓ imprimirLosDeMejorPageRank ejecutado en grafo lineal");
 
         // CASO 6: GRAFO COMPLEJO (como el de los datos de prueba originales)
         System.out.println("\n--- CASO 6: GRAFO COMPLEJO (7 autores) ---");
@@ -375,5 +426,16 @@ public class TestGraph {
         grafoComplejo.calcularPageRank();
         fin = System.currentTimeMillis();
         System.out.println("✓ PageRank ejecutado en " + (fin - inicio) + " ms");
+
+        // Probando imprimirLosDeMejorPageRank con grafo complejo
+        System.out.println("\nProbando imprimirLosDeMejorPageRank en grafo complejo...");
+        double[] valoresComplejo = {0.25, 0.2, 0.15, 0.12, 0.10, 0.09, 0.09}; // Valores decrecientes
+        System.out.println("Mostrando los 3 mejores autores:");
+        grafoComplejo.imprimirLosDeMejorPageRank(valoresComplejo, 3);
+        System.out.println("Mostrando los 5 mejores autores:");
+        // Reseteamos los valores (pues el método modifica el array)
+        double[] valoresComplejo2 = {0.25, 0.2, 0.15, 0.12, 0.10, 0.09, 0.09};
+        grafoComplejo.imprimirLosDeMejorPageRank(valoresComplejo2, 5);
+        System.out.println("✓ imprimirLosDeMejorPageRank ejecutado en grafo complejo");
     }
 }
