@@ -6,7 +6,6 @@ public class TestGraph {
         System.out.println("=== PRUEBAS DEL GRAFO ===");
 
         try {
-
             // PRIMERA PARTE: Prueba con datos reales
             System.out.println("\n--- PRUEBA CON DATOS REALES ---");
             testConDatosReales();
@@ -26,9 +25,9 @@ public class TestGraph {
 
         // Cargar datos reales
         System.out.println("Cargando datos ...");
-        repo.cargarAutor("/Users/nimilama/IdeaProjects/EDA_3/out/Datuak/authors-name-all.txt");
-        repo.cargarPublicacion("/Users/nimilama/IdeaProjects/EDA_3/out/Datuak/publications-titles-all.txt");
-        repo.cargarPublicacionesAutores("/Users/nimilama/IdeaProjects/EDA_3/out/Datuak/publications-authors-all-final.txt");
+        repo.cargarAutor("C:\\Users\\Yu Meng Ji\\IdeaProjects\\EDA\\src\\Datuak\\authors-name-all.txt");
+        repo.cargarPublicacion("C:\\Users\\Yu Meng Ji\\IdeaProjects\\EDA\\src\\Datuak\\publications-titles-all.txt");
+        repo.cargarPublicacionesAutores("C:\\Users\\Yu Meng Ji\\IdeaProjects\\EDA\\src\\Datuak\\publications-authors-all-final.txt");
 
         ArrayList<Autor> listaAutores = new ArrayList<>(repo.getListaAutores().values());
 
@@ -52,76 +51,71 @@ public class TestGraph {
         totalRelaciones /= 2;
         System.out.println("Relaciones: " + totalRelaciones);
 
-        // Probar con algunos autores reales
-        if (listaAutores.size() >= 3) {
-            String autor1 = listaAutores.get(0).getNombre();
-            String autor2 = listaAutores.get(1).getNombre();
-            String autor3 = listaAutores.get(2).getNombre();
-            String autor4 = listaAutores.get(3).getNombre();
-            String autor5 = listaAutores.get(10).getNombre();
 
-            System.out.println("\nProbando conectividad:");
-            System.out.println(autor1 + " <-> " + autor2 + ": " + grafo.estanConectado(autor1, autor2));
-            System.out.println(autor1 + " <-> " + autor3 + ": " + grafo.estanConectado(autor1, autor3));
+        System.out.println("\n--- PRUEBA CALCULAR RANDOM WALK RANK ---");
+
+        // Caso 1: Prueba con pocas iteraciones
+        System.out.println("Caso 1: Random Walk con 100 pruebas");
+        startTime = System.currentTimeMillis();
+        grafo.calcularRandomWalkRank(100);
+        endTime = System.currentTimeMillis();
+        System.out.println("Tiempo ejecución: " + (endTime - startTime) + " ms");
+
+        // Caso 2: Prueba con número intermedio de iteraciones
+        System.out.println("Caso 2: Random Walk con 1000 pruebas");
+        startTime = System.currentTimeMillis();
+        grafo.calcularRandomWalkRank(1000);
+        endTime = System.currentTimeMillis();
+        System.out.println("Tiempo ejecución: " + (endTime - startTime) + " ms");
+
+        // Caso 3: Prueba con muchas iteraciones
+        System.out.println("Caso 3: Random Walk con 5000 pruebas");
+        startTime = System.currentTimeMillis();
+        grafo.calcularRandomWalkRank(5000);
+        endTime = System.currentTimeMillis();
+        System.out.println("Tiempo ejecución: " + (endTime - startTime) + " ms");
 
 
-            ArrayList<String> camino = grafo.estanConectados(autor1, autor2);
-            if (camino != null) {
-                System.out.println("Camino encontrado: " + camino.size() + " autores");
-                System.out.println("  Camino " + autor1 + " -> " + autor2 + ":"+camino);
-            }
-            ArrayList<String> camino1 = grafo.estanConectados(autor5, autor2);
-            if (camino != null) {
-                System.out.println("Camino encontrado: " + camino1.size() + " autores");
-                System.out.println("  Camino " + autor5 + " -> " + autor2 + ":"+camino1);
-            }
-            ArrayList<String> camino2 = grafo.estanConectados(autor4, autor3);
-            if (camino != null) {
-                System.out.println("Camino encontrado: " + camino2.size() + " autores");
-                System.out.println("  Camino " + autor4 + " -> " + autor3 + ":"+camino2);
-            }
+        System.out.println("\n--- PRUEBA CALCULAR PAGERANK ---");
 
-            // MEDIR RENDIMIENTO POR MINUTO
-            System.out.println("\n--- MEDICIÓN DE RELACIONES POR MINUTO ---");
+        // Caso 1: Primera ejecución de PageRank
+        System.out.println("Caso 1: Ejecución básica de PageRank");
+        startTime = System.currentTimeMillis();
+        grafo.calcularPageRank();
+        endTime = System.currentTimeMillis();
+        System.out.println("Tiempo ejecución: " + (endTime - startTime) + " ms");
 
-            ArrayList<String> nombres = new ArrayList<>(grafo.th.keySet());
-            int consultas = 0;
-            long start = System.currentTimeMillis();
-            long end = start + 60000;
+        // Caso 2: Segunda ejecución (para ver consistencia)
+        System.out.println("Caso 2: Segunda ejecución de PageRank");
+        startTime = System.currentTimeMillis();
+        grafo.calcularPageRank();
+        endTime = System.currentTimeMillis();
+        System.out.println("Tiempo ejecución: " + (endTime - startTime) + " ms");
 
-            System.out.println("Ejecutando consultas por 1 minuto...");
 
-            while (System.currentTimeMillis() < end) {
-                // Hacer consultas simples entre los primeros autores
-                if (nombres.size() > 20) {
-                    //Consultas booleanas
-                    grafo.estanConectado(nombres.get(0), nombres.get(1));
-                    consultas++;
-                    grafo.estanConectado(nombres.get(0), nombres.get(5));
-                    consultas++;
-                    grafo.estanConectado(nombres.get(1), nombres.get(10));
-                    consultas++;
-                    grafo.estanConectado(nombres.get(20), nombres.get(4));
-                    consultas++;
-                    //Consultas de camino
-                    grafo.estanConectados(nombres.get(2), nombres.get(9));
-                    consultas++;
-                    grafo.estanConectado(nombres.get(19), nombres.get(6));
-                    consultas++;
-                    grafo.estanConectado(nombres.get(3), nombres.get(8));
-                    consultas++;
-                }
-            }
+        System.out.println("\n--- COMPARACIÓN DE RESULTADOS ---");
 
-            long tiempoReal = System.currentTimeMillis() - start;
+        // Ejecutar ambos algoritmos y comparar tiempos
+        System.out.println("Ejecutando ambos algoritmos para comparar...");
 
-            System.out.println("\nRESULTADOS :");
-            System.out.println("Tiempo real ejecutando: " + tiempoReal + " ms");
-            System.out.println("Relaciones calculadas en 1 minuto: " + consultas);
-            System.out.println("Relaciones por minuto: " + consultas);
-            System.out.println("Relaciones por hora: " + (consultas * 60));
-            System.out.println("Relaciones por segundo: " + (consultas / 60));
-        }
+        System.out.println("\n1. Ejecutando Random Walk (2000 pruebas):");
+        startTime = System.currentTimeMillis();
+        grafo.calcularRandomWalkRank(2000);
+        endTime = System.currentTimeMillis();
+        long tiempoRW = endTime - startTime;
+        System.out.println("   Tiempo Random Walk: " + tiempoRW + " ms");
+
+        System.out.println("\n2. Ejecutando PageRank:");
+        startTime = System.currentTimeMillis();
+        grafo.calcularPageRank();
+        endTime = System.currentTimeMillis();
+        long tiempoPR = endTime - startTime;
+        System.out.println("   Tiempo PageRank: " + tiempoPR + " ms");
+
+        System.out.println("\n3. Comparación de tiempos:");
+        System.out.println("   Random Walk: " + tiempoRW + " ms");
+        System.out.println("   PageRank: " + tiempoPR + " ms");
+        System.out.println("   Diferencia: " + Math.abs(tiempoRW - tiempoPR) + " ms");
 
         // Limpiar para la siguiente prueba
         repo.getListaAutores().clear();
@@ -131,10 +125,191 @@ public class TestGraph {
     private static void testConDatosPrueba() {
         Repositorio repo = Repositorio.getRepositorio();
 
-        // Crear datos de prueba simples
-        System.out.println("Creando datos de prueba...");
+        // Caso 1: Grafo vacío
+        System.out.println("\n--- Caso 1: Grafo vacío ---");
+        try {
+            ArrayList<Autor> listaVacia = new ArrayList<>();
+            Graph grafoVacio = new Graph();
+            grafoVacio.crearGrafo(listaVacia);
+            System.out.println("Grafo vacío creado");
 
-        // Autores
+            // Intentar ejecutar Random Walk en grafo vacío
+            System.out.println("Probando Random Walk en grafo vacío...");
+            try {
+                grafoVacio.calcularRandomWalkRank(100);
+                System.out.println("✗ Random Walk no debería funcionar en grafo vacío");
+            } catch (Exception e) {
+                System.out.println("✓ Random Walk lanza excepción en grafo vacío");
+            }
+
+            // Intentar ejecutar PageRank en grafo vacío
+            System.out.println("Probando PageRank en grafo vacío...");
+            try {
+                grafoVacio.calcularPageRank();
+                System.out.println("✗ PageRank no debería funcionar en grafo vacío");
+            } catch (Exception e) {
+                System.out.println("✓ PageRank lanza excepción en grafo vacío");
+            }
+        } catch (Exception e) {
+            System.out.println("Excepción esperada: " + e.getMessage());
+        }
+
+        // Caso 2: Grafo con un solo autor
+        System.out.println("\n--- Caso 2: Grafo con un solo autor ---");
+        repo.getListaAutores().clear();
+        repo.getListaPublicaciones().clear();
+
+        repo.añadirAutor("S1", "Autor Solitario");
+        repo.añadirPublicacion("PS1", "Publicación Solitaria");
+        repo.añadirAutorAPublicacion("S1", "PS1");
+
+        ArrayList<Autor> listaSolitario = new ArrayList<>(repo.getListaAutores().values());
+        Graph grafoSolitario = new Graph();
+        grafoSolitario.crearGrafo(listaSolitario);
+        System.out.println("Grafo con un solo autor creado (1 nodo)");
+
+        // Probando Random Walk
+        System.out.println("Probando Random Walk con un solo autor...");
+        grafoSolitario.calcularRandomWalkRank(100);
+        System.out.println("✓ Random Walk ejecutado con un solo autor");
+
+        // Probando PageRank
+        System.out.println("Probando PageRank con un solo autor...");
+        grafoSolitario.calcularPageRank();
+        System.out.println("✓ PageRank ejecutado con un solo autor");
+
+        // Caso 3: Grafo completamente conectado
+        System.out.println("\n--- Caso 3: Grafo completamente conectado ---");
+        repo.getListaAutores().clear();
+        repo.getListaPublicaciones().clear();
+
+        // Crear 3 autores
+        repo.añadirAutor("C1", "Autor Conectado 1");
+        repo.añadirAutor("C2", "Autor Conectado 2");
+        repo.añadirAutor("C3", "Autor Conectado 3");
+
+        // Crear una publicación con los 3 autores (completamente conectados)
+        repo.añadirPublicacion("PC1", "Publicación Conectada");
+        repo.añadirAutorAPublicacion("C1", "PC1");
+        repo.añadirAutorAPublicacion("C2", "PC1");
+        repo.añadirAutorAPublicacion("C3", "PC1");
+
+        ArrayList<Autor> listaConectada = new ArrayList<>(repo.getListaAutores().values());
+        Graph grafoConectado = new Graph();
+        grafoConectado.crearGrafo(listaConectada);
+        System.out.println("Grafo completamente conectado creado");
+
+        // Probando Random Walk
+        System.out.println("Probando Random Walk en grafo completamente conectado...");
+        long inicio = System.currentTimeMillis();
+        grafoConectado.calcularRandomWalkRank(500);
+        long fin = System.currentTimeMillis();
+        System.out.println("✓ Random Walk ejecutado en " + (fin - inicio) + " ms");
+
+        // Probando PageRank
+        System.out.println("Probando PageRank en grafo completamente conectado...");
+        inicio = System.currentTimeMillis();
+        grafoConectado.calcularPageRank();
+        fin = System.currentTimeMillis();
+        System.out.println("✓ PageRank ejecutado en " + (fin - inicio) + " ms");
+
+        // Caso 4: Grafo en estrella (un autor central conectado a muchos)
+        System.out.println("\n--- CASO 4: Grafo en estrella ---");
+        repo.getListaAutores().clear();
+        repo.getListaPublicaciones().clear();
+
+        // Crear autores
+        repo.añadirAutor("E1", "Autor Centro");
+        repo.añadirAutor("E2", "Autor Periferia 1");
+        repo.añadirAutor("E3", "Autor Periferia 2");
+        repo.añadirAutor("E4", "Autor Periferia 3");
+        repo.añadirAutor("E5", "Autor Periferia 4");
+
+        // Crear publicaciones que conecten el centro con cada periferia
+        repo.añadirPublicacion("PE1", "Pub Centro-Periferia 1");
+        repo.añadirAutorAPublicacion("E1", "PE1");
+        repo.añadirAutorAPublicacion("E2", "PE1");
+
+        repo.añadirPublicacion("PE2", "Pub Centro-Periferia 2");
+        repo.añadirAutorAPublicacion("E1", "PE2");
+        repo.añadirAutorAPublicacion("E3", "PE2");
+
+        repo.añadirPublicacion("PE3", "Pub Centro-Periferia 3");
+        repo.añadirAutorAPublicacion("E1", "PE3");
+        repo.añadirAutorAPublicacion("E4", "PE3");
+
+        repo.añadirPublicacion("PE4", "Pub Centro-Periferia 4");
+        repo.añadirAutorAPublicacion("E1", "PE4");
+        repo.añadirAutorAPublicacion("E5", "PE4");
+
+        ArrayList<Autor> listaEstrella = new ArrayList<>(repo.getListaAutores().values());
+        Graph grafoEstrella = new Graph();
+        grafoEstrella.crearGrafo(listaEstrella);
+        System.out.println("Grafo en estrella creado");
+
+        // Probando Random Walk
+        System.out.println("Probando Random Walk en grafo estrella...");
+        inicio = System.currentTimeMillis();
+        grafoEstrella.calcularRandomWalkRank(1000);
+        fin = System.currentTimeMillis();
+        System.out.println("✓ Random Walk ejecutado en " + (fin - inicio) + " ms");
+
+        // Probando PageRank
+        System.out.println("Probando PageRank en grafo estrella...");
+        inicio = System.currentTimeMillis();
+        grafoEstrella.calcularPageRank();
+        fin = System.currentTimeMillis();
+        System.out.println("✓ PageRank ejecutado en " + (fin - inicio) + " ms");
+
+        // Caso 5: Grafo lineal
+        System.out.println("\n--- Caso 5: Grafo lineal ---");
+        repo.getListaAutores().clear();
+        repo.getListaPublicaciones().clear();
+
+        // Crear autores
+        repo.añadirAutor("L1", "Autor Lineal 1");
+        repo.añadirAutor("L2", "Autor Lineal 2");
+        repo.añadirAutor("L3", "Autor Lineal 3");
+        repo.añadirAutor("L4", "Autor Lineal 4");
+
+        // Crear publicaciones que formen una cadena lineal
+        repo.añadirPublicacion("PL1", "Pub Lineal 1-2");
+        repo.añadirAutorAPublicacion("L1", "PL1");
+        repo.añadirAutorAPublicacion("L2", "PL1");
+
+        repo.añadirPublicacion("PL2", "Pub Lineal 2-3");
+        repo.añadirAutorAPublicacion("L2", "PL2");
+        repo.añadirAutorAPublicacion("L3", "PL2");
+
+        repo.añadirPublicacion("PL3", "Pub Lineal 3-4");
+        repo.añadirAutorAPublicacion("L3", "PL3");
+        repo.añadirAutorAPublicacion("L4", "PL3");
+
+        ArrayList<Autor> listaLineal = new ArrayList<>(repo.getListaAutores().values());
+        Graph grafoLineal = new Graph();
+        grafoLineal.crearGrafo(listaLineal);
+        System.out.println("Grafo lineal creado (4 nodos en cadena)");
+
+        // Probando Random Walk
+        System.out.println("Probando Random Walk en grafo lineal...");
+        inicio = System.currentTimeMillis();
+        grafoLineal.calcularRandomWalkRank(800);
+        fin = System.currentTimeMillis();
+        System.out.println("✓ Random Walk ejecutado en " + (fin - inicio) + " ms");
+
+        // Probando PageRank
+        System.out.println("Probando PageRank en grafo lineal...");
+        inicio = System.currentTimeMillis();
+        grafoLineal.calcularPageRank();
+        fin = System.currentTimeMillis();
+        System.out.println("✓ PageRank ejecutado en " + (fin - inicio) + " ms");
+
+        // CASO 6: GRAFO COMPLEJO (como el de los datos de prueba originales)
+        System.out.println("\n--- CASO 6: GRAFO COMPLEJO (7 autores) ---");
+        repo.getListaAutores().clear();
+        repo.getListaPublicaciones().clear();
+
+        // Crear datos de prueba originales (copiado de tu código)
         repo.añadirAutor("A1", "Autor 1");
         repo.añadirAutor("A2", "Autor 2");
         repo.añadirAutor("A3", "Autor 3");
@@ -143,7 +318,6 @@ public class TestGraph {
         repo.añadirAutor("A6", "Autor 6");
         repo.añadirAutor("A7", "Autor 7");
 
-        // Publicaciones
         repo.añadirPublicacion("P1", "Publicacion 1");
         repo.añadirPublicacion("P2", "Publicacion 2");
         repo.añadirPublicacion("P3", "Publicacion 3");
@@ -151,86 +325,55 @@ public class TestGraph {
         repo.añadirPublicacion("P5", "Publicacion 5");
         repo.añadirPublicacion("P6", "Publicacion 6");
 
-        // Relaciones: A1-A2-A3-A4 y A1-A5-A6-A7
         repo.añadirAutorAPublicacion("A1", "P1");
-        repo.añadirAutorAPublicacion("A2", "P1");  // A1 y A2 conectados
+        repo.añadirAutorAPublicacion("A2", "P1");
 
         repo.añadirAutorAPublicacion("A2", "P2");
-        repo.añadirAutorAPublicacion("A3", "P2");  // A2 y A3 conectados
+        repo.añadirAutorAPublicacion("A3", "P2");
 
         repo.añadirAutorAPublicacion("A3", "P3");
-        repo.añadirAutorAPublicacion("A4", "P3");  // A3 y A4 conectados
+        repo.añadirAutorAPublicacion("A4", "P3");
 
         repo.añadirAutorAPublicacion("A1", "P4");
-        repo.añadirAutorAPublicacion("A5", "P4");  // A1 y A5 conectados
+        repo.añadirAutorAPublicacion("A5", "P4");
 
         repo.añadirAutorAPublicacion("A5", "P5");
-        repo.añadirAutorAPublicacion("A6", "P5");  // A5 y A6 conectados
+        repo.añadirAutorAPublicacion("A6", "P5");
 
         repo.añadirAutorAPublicacion("A6", "P6");
-        repo.añadirAutorAPublicacion("A7", "P6");  // A6 y A7 conectados
+        repo.añadirAutorAPublicacion("A7", "P6");
 
+        ArrayList<Autor> listaCompleja = new ArrayList<>(repo.getListaAutores().values());
+        Graph grafoComplejo = new Graph();
+        grafoComplejo.crearGrafo(listaCompleja);
+        System.out.println("Grafo complejo creado");
 
-        ArrayList<Autor> listaAutores = new ArrayList<>(repo.getListaAutores().values());
+        // Probando Random Walk con diferentes configuraciones
+        System.out.println("\nProbando Random Walk con diferentes configuraciones:");
 
-        // Crear grafo
-        Graph grafo = new Graph();
-        System.out.println("Creando grafo con datos de prueba...");
-        grafo.crearGrafo(listaAutores);
-        System.out.println("Grafo creado exitosamente");
+        System.out.println("1. Random Walk con 500 pruebas:");
+        inicio = System.currentTimeMillis();
+        grafoComplejo.calcularRandomWalkRank(500);
+        fin = System.currentTimeMillis();
+        System.out.println("   Tiempo: " + (fin - inicio) + " ms");
 
-        // Pruebas de conectividad
-        System.out.println("\n--- PRUEBAS DE CONECTIVIDAD ---");
-        // Caso 1: Autores directamente conectados
-        System.out.println("A1 <-> A2 (directo): " + grafo.estanConectado("Autor 1", "Autor 2") + " camino: " + grafo.estanConectados("Autor 1", "Autor 2"));
-        System.out.println("A2 <-> A3 (directo): " + grafo.estanConectado("Autor 2", "Autor 3") + " camino: " + grafo.estanConectados("Autor 2", "Autor 3"));
-        System.out.println("A3 <-> A4 (directo): " + grafo.estanConectado("Autor 3", "Autor 4") + " camino: " + grafo.estanConectados("Autor 3", "Autor 4"));
-        System.out.println("A1 <-> A5 (directo): " + grafo.estanConectado("Autor 1", "Autor 5") + " camino: " + grafo.estanConectados("Autor 1", "Autor 5"));
-        System.out.println("A5 <-> A6 (directo): " + grafo.estanConectado("Autor 5", "Autor 6") + " camino: " + grafo.estanConectados("Autor 5", "Autor 6"));
-        System.out.println("A6 <-> A7 (directo): " + grafo.estanConectado("Autor 6", "Autor 7") + " camino: " + grafo.estanConectados("Autor 6", "Autor 7"));
+        System.out.println("2. Random Walk con 2000 pruebas:");
+        inicio = System.currentTimeMillis();
+        grafoComplejo.calcularRandomWalkRank(2000);
+        fin = System.currentTimeMillis();
+        System.out.println("   Tiempo: " + (fin - inicio) + " ms");
 
-        // Caso 2: Autores en misma cadena lineal
-        System.out.println("A1 <-> A4 (cadena lineal): " + grafo.estanConectado("Autor 1", "Autor 4") + " camino: " + grafo.estanConectados("Autor 1", "Autor 4"));
-        System.out.println("A1 <-> A3 (cadena lineal): " + grafo.estanConectado("Autor 1", "Autor 3") + " camino: " + grafo.estanConectados("Autor 1", "Autor 3"));
-        System.out.println("A1 <-> A6 (cadena lineal): " + grafo.estanConectado("Autor 1", "Autor 6") + " camino: " + grafo.estanConectados("Autor 1", "Autor 6"));
-        System.out.println("A1 <-> A7 (cadena lineal): " + grafo.estanConectado("Autor 1", "Autor 7") + " camino: " + grafo.estanConectados("Autor 1", "Autor 7"));
+        System.out.println("3. Random Walk con 5000 pruebas:");
+        inicio = System.currentTimeMillis();
+        grafoComplejo.calcularRandomWalkRank(5000);
+        fin = System.currentTimeMillis();
+        System.out.println("   Tiempo: " + (fin - inicio) + " ms");
 
-        // Caso 3: Autores en diferentes cadenas pero conectados
-        System.out.println("A2 <-> A6 (cruzado): " + grafo.estanConectado("Autor 2", "Autor 6") + " camino: " + grafo.estanConectados("Autor 2", "Autor 6"));
-        System.out.println("A3 <-> A6 (cruzado): " + grafo.estanConectado("Autor 3", "Autor 6") + " camino: " + grafo.estanConectados("Autor 3", "Autor 6"));
-        System.out.println("A2 <-> A5 (cruzado): " + grafo.estanConectado("Autor 2", "Autor 5") + " camino: " + grafo.estanConectados("Autor 2", "Autor 5"));
-        System.out.println("A3 <-> A5 (cruzado): " + grafo.estanConectado("Autor 3", "Autor 5") + " camino: " + grafo.estanConectados("Autor 3", "Autor 5"));
-
-        // Caso 4: Mismo autor
-        System.out.println("A1 <-> A1 (mismo): " + grafo.estanConectado("Autor 1", "Autor 1") + " camino: " + grafo.estanConectados("Autor 1", "Autor 1"));
-        System.out.println("A2 <-> A2 (mismo): " + grafo.estanConectado("Autor 2", "Autor 2") + " camino: " + grafo.estanConectados("Autor 2", "Autor 2"));
-        System.out.println("A3 <-> A3 (mismo): " + grafo.estanConectado("Autor 3", "Autor 3") + " camino: " + grafo.estanConectados("Autor 3", "Autor 3"));
-        System.out.println("A4 <-> A4 (mismo): " + grafo.estanConectado("Autor 4", "Autor 4") + " camino: " + grafo.estanConectados("Autor 4", "Autor 4"));
-        System.out.println("A5 <-> A5 (mismo): " + grafo.estanConectado("Autor 5", "Autor 5") + " camino: " + grafo.estanConectados("Autor 5", "Autor 5"));
-        System.out.println("A6 <-> A6 (mismo): " + grafo.estanConectado("Autor 6", "Autor 6") + " camino: " + grafo.estanConectados("Autor 6", "Autor 6"));
-        System.out.println("A7 <-> A7 (mismo): " + grafo.estanConectado("Autor 7", "Autor 7") + " camino: " + grafo.estanConectados("Autor 7", "Autor 7"));
-
-        // Caso 5: Autores en extremos de diferentes cadenas
-        System.out.println("A4 <-> A7 (extremos): " + grafo.estanConectado("Autor 4", "Autor 7") + " camino: " + grafo.estanConectados("Autor 4", "Autor 7"));
-
-
-        // Mostrar estructura del grafo
-        System.out.println("\n--- ESTRUCTURA DEL GRAFO ---");
-        grafo.print();
+        // Probando PageRank
+        System.out.println("\nProbando PageRank:");
+        inicio = System.currentTimeMillis();
+        grafoComplejo.calcularPageRank();
+        fin = System.currentTimeMillis();
+        System.out.println("✓ PageRank ejecutado en " + (fin - inicio) + " ms");
     }
-
-// CAPACIDAD DEL SISTEMA:
-//- Consultas por segundo:27
-//- Consultas por minuto: 1,666
-//- Consultas por hora: 99,960
-//- Tamaño máximo probado: 273,884 autores, 8,258,303 relaciones
-//- Tiempo construcción grafo: 66,904 ms
-
-// EJEMPLOS EJECUTADOS:
-// estanConectado("Kevin Thiele", "Cristian Launes") -> true
-// estanConectados("Kevin Thiele", "Bauke W Dijkstra") ->
-//  [Kevin Thiele, Pauline Ladiges, Paul Irwin Forster,
-//   Ronald J. Quinn, Alysha G. Elliott, David Craik,
-//   Bernard Henrissat, Francine Govers, Ben Feringa,
-//   Bauke W Dijkstra]
 }
