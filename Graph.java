@@ -228,11 +228,8 @@ public class Graph {
     }
 
 
+    
     public HashMap<String, Double> calcularPageRank() {
-        boolean trace = false; // tracing the pagerank algorithm
-        boolean damping = true; // tracing the pagerank algorithm
-        double d = 0.85;
-        double umbral = 0.0001;
         HashMap<String, Double> result = new HashMap<>();
 
         if (keys == null || keys.length == 0) {
@@ -241,70 +238,73 @@ public class Graph {
         }
 
         int n = keys.length;
-        double[] prActual = new double[n];
-        double[] prAnterior = new double[n];
+        double d = 0.85;
+        double umbral = 0.0001;
+        int maxIteraciones = 100;
 
+        // Inicializar PageRank uniformemente
+        double[] pr = new double[n];
+        double[] prNuevo = new double[n];
+        double valorInicial = 1.0 / n;
+
+        Arrays.fill(pr, valorInicial);
+
+        // Precomputar grados de salida
+        int[] grados = new int[n];
         for (int i = 0; i < n; i++) {
-            prActual[i] = 1.0 / n;
-            prAnterior[i] = 1.0 / n;
+            grados[i] = adjList[i].size();
         }
 
-        int iteraciones = 0;
-        double diferencia = 1000000.0; // Número grande inicial
+        int iteracion = 0;
+        double diferencia = Double.MAX_VALUE;
 
-        while (diferencia > umbral && iteraciones < 100) {
-            if (trace) {
-                System.out.println("Iteración" + iteraciones);
-            }
-            // Copiar valores actuales a la iteración anterior
+        while (diferencia > umbral && iteracion < maxIteraciones) {
+            // Reiniciar nuevos valores con el término (1-d)/N
+            double base = (1 - d) / n;
+            Arrays.fill(prNuevo, base);
+
+            // Distribuir PageRank a lo largo de los enlaces
             for (int i = 0; i < n; i++) {
-                prAnterior[i] = prActual[i];
-            }
-            // Calcular PageRank para cada nodo
-            for (int i = 0; i < n; i++) {
-                double suma = 0.0;
-                // Encontrar todos los nodos que apuntan al nodo i
-                for (int j = 0; j < n; j++) {
-                    if (i != j && adjList[j].contains(i)) {
-                        int salientes = adjList[j].size();
-                        if (salientes > 0) {
-                            suma = suma + prAnterior[j] / salientes;
-                        }
+                if (grados[i] > 0) {
+                    double contribucion = d * pr[i] / grados[i];
+                    for (int vecino : adjList[i]) {
+                        prNuevo[vecino] += contribucion;
+                    }
+                } else {
+                    // Nodo sin enlaces salientes: distribuir a todos
+                    double contribucion = d * pr[i] / n;
+                    for (int j = 0; j < n; j++) {
+                        prNuevo[j] += contribucion;
                     }
                 }
-                // Aplicar fórmula de PageRank
-                if (damping) {
-                    prActual[i] = (1 - d) / n + d * suma;
-                } else {
-                    prActual[i] = suma;
-                }
             }
+
             // Calcular diferencia total
             diferencia = 0.0;
             for (int i = 0; i < n; i++) {
-                double dif = prActual[i] - prAnterior[i];
-                if (dif < 0) {
-                    dif = -dif; // Valor absoluto
-                }
-                diferencia = diferencia + dif;
+                diferencia += Math.abs(prNuevo[i] - pr[i]);
             }
-            iteraciones++;
 
-            if (trace) {
-                System.out.println("Diferencia: " + diferencia);
+            // Preparar siguiente iteración
+            double[] temp = pr;
+            pr = prNuevo;
+            prNuevo = temp;
+
+            iteracion++;
+
+            if (iteracion % 10 == 0) {
+                System.out.println("Iteración " + iteracion + ", diferencia: " + diferencia);
             }
         }
-        if (trace) {
-            System.out.println("Convergió en " + iteraciones + "iteraciones");
-        }
 
-        // Convertir a HashMap para retornar
+        System.out.println("PageRank convergió en " + iteracion + " iteraciones");
+
+        // Normalizar y guardar resultados
         for (int i = 0; i < n; i++) {
-            result.put(keys[i], prActual[i]);
+            result.put(keys[i], pr[i]);
         }
 
         return result;
-
     }
 
     public void imprimirLosDeMejorPageRank(double[] pr, int n) { // inefficient but valid!
@@ -325,3 +325,4 @@ public class Graph {
         }
     }
 }
+
